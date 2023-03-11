@@ -3,7 +3,6 @@ package me.heartalborada.newBingAPI.utils;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import me.heartalborada.newBingAPI.exceptions.ConversationException;
 import me.heartalborada.newBingAPI.types.chat.*;
 import me.heartalborada.newBingAPI.types.chatWebsocketJson;
 import okhttp3.Response;
@@ -47,9 +46,8 @@ public class conversationWebsocket extends WebSocketListener {
 
     @Override
     public void onMessage(@NotNull WebSocket webSocket, @NotNull String text) {
-        System.out.println(text);
         JsonObject json = JsonParser.parseString(text.split(String.valueOf(TerminalChar))[0]).getAsJsonObject();
-        if(json.get("type").getAsInt() == 2){
+        if(json.has("type")&&json.getAsJsonPrimitive("type").getAsString().equals("2")){
             webSocket.close(0,"");
         }
         super.onMessage(webSocket, text);
@@ -63,7 +61,7 @@ public class conversationWebsocket extends WebSocketListener {
                 new chatWebsocketJson(new argument[]{
                         new argument(
                                 randomString(32).toLowerCase(),
-                                true,
+                                invocationID.equals("1"),
                                 new message(
                                         "zh-CN",
                                         null,

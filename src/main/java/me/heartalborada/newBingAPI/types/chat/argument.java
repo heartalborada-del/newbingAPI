@@ -7,36 +7,7 @@ public class argument {
     private final String[] sliceIds={"scfraithtr3", "scraith30", "linkimgincf", "308sahara", "228h3adss0", "h3adss0", "0310wlthrot", "cache0307", "ssoverlap50", "ssplon", "sssreduce", "sswebtop2", "302blocklist", "308disbing", "224locals0", "224locals0"};
     private final String traceId;
     private final boolean isStartOfSession;
-    //need set This
     private final message message;
-    /*Like this
-    {
-			"locale": "zh-CN",
-			"market": "zh-CN",
-			"region": "US",
-			"location": "lat:47.639557;long:-122.128159;re=1000m;",
-			"locationHints": [{
-				"country": "Australia",
-				"state": "Victoria",
-				"city": "Research",
-				"zipcode": "3095",
-				"timezoneoffset": 10,
-				"countryConfidence": 8,
-				"cityConfidence": 5,
-				"Center": {
-					"Latitude": -37.7114,
-					"Longitude": 145.1663
-				},
-				"RegionType": 2,
-				"SourceType": 1
-			}],
-			"timestamp": "2023-03-11T17:17:27+08:00",
-			"author": "user",
-			"inputMethod": "Keyboard",
-			"text": "我想学习一项新技能",
-			"messageType": "Chat"
-		}
-     */
     private final String conversationSignature;
     private final participant participant;
     private final String conversationId;
