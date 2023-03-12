@@ -37,4 +37,4 @@ build/
 ### Mac OS ###
 .DS_Store
 /.idea/
-/src/main/java/me/heartalborada/newBingAPI/Main.java
+/src/main/java/io/github/heartalborada_del/newBingAPI/Main.java
