@@ -7,10 +7,10 @@ public class message {
     private final String location;
     private final locationHints locationHints;
     private final String timestamp;
-    private final String author="user";
-    private final String inputMethod="Keyboard";
+    private final String author = "user";
+    private final String inputMethod = "Keyboard";
     private final String text;
-    private final String messageType="Chat";
+    private final String messageType = "Chat";
 
     public message(String locale, String market, String region, String location, io.github.heartalborada_del.newBingAPI.types.chat.locationHints locationHints, String timestamp, String text) {
         this.locale = locale;

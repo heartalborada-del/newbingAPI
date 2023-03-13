@@ -1,14 +1,14 @@
 package io.github.heartalborada_del.newBingAPI.utils;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import io.github.heartalborada_del.newBingAPI.interfaces.Callback;
+import io.github.heartalborada_del.newBingAPI.types.ChatWebsocketJson;
 import io.github.heartalborada_del.newBingAPI.types.chat.argument;
 import io.github.heartalborada_del.newBingAPI.types.chat.message;
 import io.github.heartalborada_del.newBingAPI.types.chat.participant;
 import io.github.heartalborada_del.newBingAPI.types.chat.previousMessages;
-import io.github.heartalborada_del.newBingAPI.types.chatWebsocketJson;
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import okhttp3.Response;
 import okhttp3.WebSocket;
 import okhttp3.WebSocketListener;
@@ -23,10 +23,11 @@ public class conversationWebsocket extends WebSocketListener {
     private final String question;
     private final String invocationID;
     private final Callback callback;
-    public conversationWebsocket(String ConversationId, String ClientId, String ConversationSignature, String question, short invocationID, Callback callback){
-        conversationId=ConversationId;
-        clientId=ClientId;
-        conversationSignature=ConversationSignature;
+
+    public conversationWebsocket(String ConversationId, String ClientId, String ConversationSignature, String question, short invocationID, Callback callback) {
+        conversationId = ConversationId;
+        clientId = ClientId;
+        conversationSignature = ConversationSignature;
         this.question = question;
         this.invocationID = String.valueOf(invocationID);
         this.callback = callback;
@@ -50,13 +51,13 @@ public class conversationWebsocket extends WebSocketListener {
     @Override
     public void onMessage(@NotNull WebSocket webSocket, @NotNull String text) {
         JsonObject json = JsonParser.parseString(text.split(String.valueOf(TerminalChar))[0]).getAsJsonObject();
-        if(json.has("type")&&json.getAsJsonPrimitive("type").getAsInt()==2){;
-            if(json.getAsJsonObject("item").has("result") && !json.getAsJsonObject("item").getAsJsonObject("result").getAsJsonPrimitive("value").getAsString().equals("Success")){
-                callback.onFailed(json,json.getAsJsonObject("item").getAsJsonObject("result").getAsJsonPrimitive("message").getAsString());
+        if (json.has("type") && json.getAsJsonPrimitive("type").getAsInt() == 2) {
+            if (json.getAsJsonObject("item").has("result") && !json.getAsJsonObject("item").getAsJsonObject("result").getAsJsonPrimitive("value").getAsString().equals("Success")) {
+                callback.onFailed(json, json.getAsJsonObject("item").getAsJsonObject("result").getAsJsonPrimitive("message").getAsString());
             } else {
                 callback.onSuccess(json);
             }
-            webSocket.close(0,"");
+            webSocket.close(0, "");
         }
         super.onMessage(webSocket, text);
     }
@@ -64,9 +65,9 @@ public class conversationWebsocket extends WebSocketListener {
     @Override
     public void onOpen(@NotNull WebSocket webSocket, @NotNull Response response) {
         super.onOpen(webSocket, response);
-        webSocket.send("{\"protocol\":\"json\",\"version\":1}"+TerminalChar);
-        String s= new Gson().toJson(
-                new chatWebsocketJson(new argument[]{
+        webSocket.send("{\"protocol\":\"json\",\"version\":1}" + TerminalChar);
+        String s = new Gson().toJson(
+                new ChatWebsocketJson(new argument[]{
                         new argument(
                                 utils.randomString(32).toLowerCase(),
                                 invocationID.equals("1"),
@@ -84,8 +85,8 @@ public class conversationWebsocket extends WebSocketListener {
                                 conversationId,
                                 new previousMessages[]{}
                         )
-                },invocationID)
+                }, invocationID)
         );
-        webSocket.send(s+TerminalChar);
+        webSocket.send(s + TerminalChar);
     }
 }

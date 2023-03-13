@@ -2,8 +2,8 @@ package io.github.heartalborada_del.newBingAPI.types.chat;
 
 public class previousMessages {
     private final String text;
-    private final String author="bot";
-    private final String[] adaptiveCards={};
+    private final String author = "bot";
+    private final String[] adaptiveCards = {};
     private final suggestedResponses[] suggestedResponses;
     private final String messageId;
     private final String messageType;

@@ -9,8 +9,8 @@ public class locationHints {
     private final int countryConfidence;
     private final int cityConfidence;
     private final location Center;
-    private final int RegionType=2;
-    private final int SourceType=1;
+    private final int RegionType = 2;
+    private final int SourceType = 1;
 
     public locationHints(String country, String state, String city, String zipcode, int timezoneoffset, int countryConfidence, int cityConfidence, location center) {
         this.country = country;
