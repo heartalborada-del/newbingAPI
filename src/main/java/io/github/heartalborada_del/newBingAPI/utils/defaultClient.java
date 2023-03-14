@@ -7,18 +7,34 @@ import okhttp3.Response;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
+import java.util.Random;
 
 public class defaultClient {
     private final OkHttpClient client;
     private final String cookie;
     private final boolean bypassCN;
 
+    private final String[] overseaIPs={
+            "8.8.8.8",
+            "1.1.1.1"
+    };
+
+    private final String IP;
+    private String getRandomIP(){
+        return overseaIPs[new Random().nextInt(overseaIPs.length)];
+    }
     public defaultClient(Boolean BypassCN, String Cookie) {
         bypassCN = BypassCN;
+        IP=getRandomIP();
         cookie = Cookie;
         client = new OkHttpClient.Builder().addInterceptor(new headerInterceptor()).build();
     }
-
+    public defaultClient(Boolean BypassCN, String Cookie, String IP){
+        bypassCN = BypassCN;
+        this.IP=IP;
+        cookie = Cookie;
+        client = new OkHttpClient.Builder().addInterceptor(new headerInterceptor()).build();
+    }
     public OkHttpClient getClient() {
         return client;
     }
@@ -31,7 +47,7 @@ public class defaultClient {
             b.addHeader("Cookie", cookie);
             b.addHeader("Origin", "https://www.bing.com");
             b.addHeader("user-agent", "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 Safari/537.36 Edg/110.0.1587.69");
-            if (bypassCN) b.addHeader("X-Forwarded-For", "8.8.8.8");
+            //if (bypassCN) b.addHeader("X-Forwarded-For", IP);
             return chain.proceed(b.build());
         }
     }

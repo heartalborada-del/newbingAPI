@@ -50,10 +50,7 @@
             <build>
                 <resources>
                     <resource>
-                        <directory>src/main/java</directory>
-                        <excludes>
-                            <exclude>Main.java</exclude>
-                        </excludes>
+                        <directory>src/main/resources</directory>
                     </resource>
                 </resources>
                 <plugins>
@@ -110,6 +107,9 @@
                             <verbose>true</verbose>
                             <encoding>UTF-8</encoding>
                             <showWarnings>false</showWarnings>
+                            <excludes>
+                                <exclude>**/Main.java</exclude>
+                            </excludes>
                         </configuration>
                     </plugin>
                     <!--Release -->
