@@ -50,39 +50,49 @@ public class conversationWebsocket extends WebSocketListener {
 
     @Override
     public void onMessage(@NotNull WebSocket webSocket, @NotNull String text) {
-        if(text.equals("{}\u001E")) {
-            webSocket.send("{type:6}\u001E");
-            webSocket.send(new Gson().toJson(
-                    new ChatWebsocketJson(new argument[]{
-                            new argument(
-                                    utils.randomString(32).toLowerCase(),
-                                    invocationID.equals("1"),
-                                    new message(
-                                            "zh-CN",
-                                            null,
-                                            null,
-                                            null,
-                                            null,
-                                            utils.getNowTime(),
-                                            question
-                                    ),
-                                    conversationSignature,
-                                    new participant(clientId),
-                                    conversationId,
-                                    new previousMessages[]{}
-                            )
-                    }, invocationID)
-            ) + TerminalChar);
-            return;
-        }
-        JsonObject json = JsonParser.parseString(text.split(String.valueOf(TerminalChar))[0]).getAsJsonObject();
-        if (json.has("type") && json.getAsJsonPrimitive("type").getAsInt() == 2) {
-            if (json.getAsJsonObject("item").has("result") && !json.getAsJsonObject("item").getAsJsonObject("result").getAsJsonPrimitive("value").getAsString().equals("Success")) {
-                callback.onFailed(json, json.getAsJsonObject("item").getAsJsonObject("result").getAsJsonPrimitive("message").getAsString());
-            } else {
-                callback.onSuccess(json);
+        for(String textSpited : text.split(String.valueOf(TerminalChar))){
+            JsonObject json = JsonParser.parseString(textSpited).getAsJsonObject();
+            if(json.isEmpty()){
+                webSocket.send("{\"type:6\"}\u001E");
+                webSocket.send(new Gson().toJson(
+                        new ChatWebsocketJson(new argument[]{
+                                new argument(
+                                        utils.randomString(32).toLowerCase(),
+                                        invocationID.equals("1"),
+                                        new message(
+                                                "zh-CN",
+                                                null,
+                                                null,
+                                                null,
+                                                null,
+                                                utils.getNowTime(),
+                                                question
+                                        ),
+                                        conversationSignature,
+                                        new participant(clientId),
+                                        conversationId,
+                                        new previousMessages[]{}
+                                )
+                        }, invocationID)
+                ) + TerminalChar);
+            } else if(json.has("type")){
+                int type = json.getAsJsonObject("type").getAsInt();
+                if(type == 3) {
+                    //end
+                    webSocket.close(0, String.valueOf(TerminalChar));
+                } else if (type == 6) {
+                    //resend packet
+                    webSocket.send("{\"type\":6}\u001E");
+                } else if(type == 2){
+                    if (json.getAsJsonObject("item").has("result") && !json.getAsJsonObject("item").getAsJsonObject("result").getAsJsonPrimitive("value").getAsString().equals("Success")) {
+                        callback.onFailed(json, json.getAsJsonObject("item").getAsJsonObject("result").getAsJsonPrimitive("message").getAsString());
+                    } else {
+                        callback.onSuccess(json);
+                    }
+                } else if (type == 1) {
+                    //TODO MESSAGE UPDATE EVENT
+                }
             }
-            webSocket.close(0, "");
         }
         super.onMessage(webSocket, text);
     }
