@@ -6,7 +6,7 @@
 
     <groupId>io.github.heartalborada-del</groupId>
     <artifactId>newBingAPI</artifactId>
-    <version>1.0.0-Release</version>
+    <version>1.0.1-Release</version>
 
     <properties>
         <maven.compiler.source>11</maven.compiler.source>

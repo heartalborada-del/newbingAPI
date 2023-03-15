@@ -8,6 +8,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.util.Random;
+import java.util.UUID;
 
 public class defaultClient {
     private final OkHttpClient client;
@@ -47,7 +48,9 @@ public class defaultClient {
             b.addHeader("Cookie", cookie);
             b.addHeader("Origin", "https://www.bing.com");
             b.addHeader("user-agent", "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 Safari/537.36 Edg/110.0.1587.69");
-            //if (bypassCN) b.addHeader("X-Forwarded-For", IP);
+            b.addHeader("x-ms-client-request-id", UUID.randomUUID().toString());
+            b.addHeader("x-ms-useragent","azsdk-js-api-client-factory/1.0.0-beta.1 core-rest-pipeline/1.10.0 OS/Win32");
+            if (bypassCN) b.addHeader("X-Forwarded-For", IP);
             return chain.proceed(b.build());
         }
     }
