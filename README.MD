@@ -2,6 +2,7 @@
 
 这是一个newBing API的Java实现
 
+## 目前请先将 `byPassCN` 设置成 `false`
 
 ## How to use it
 
@@ -19,7 +20,7 @@ import com.google.gson.JsonObject;
 
 public class Main {
     public static void main(String[] args) {
-        new chat(
+        new Chat(
                 "Your cookies",
                 true
         ).newChat().newQuestion("Your question", new Callback() {
@@ -29,7 +30,11 @@ public class Main {
             }
 
             @Override
-            public void onFailed(JsonObject rawData, String cause) {
+            public void onFailure(JsonObject rawData, String cause) {
+                //TODO
+            }
+            @Override
+            public void onUpdate(JsonObject rawData){
                 //TODO
             }
         });

@@ -4,7 +4,7 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Random;
 
-public class utils {
+public class Utils {
     public static String getNowTime() {
         ZonedDateTime date = ZonedDateTime.now();
         return date.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME);

@@ -6,7 +6,7 @@ public class ConversationException extends Exception {
         super(message);
     }
 
-    public ConversationException(String message,Throwable throwable) {
-        super(message,throwable);
+    public ConversationException(String message, Throwable throwable) {
+        super(message, throwable);
     }
 }

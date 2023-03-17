@@ -12,5 +12,7 @@ public interface Callback {
      * @param rawData json data
      * @param cause   cause
      */
-    void onFailed(JsonObject rawData, String cause);
+    void onFailure(JsonObject rawData, String cause);
+
+    void onUpdate(JsonObject rawData);
 }

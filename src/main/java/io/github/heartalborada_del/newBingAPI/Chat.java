@@ -1,27 +1,49 @@
 package io.github.heartalborada_del.newBingAPI;
 
 import io.github.heartalborada_del.newBingAPI.instances.ChatInstance;
-import io.github.heartalborada_del.newBingAPI.utils.defaultClient;
+import io.github.heartalborada_del.newBingAPI.interfaces.Logger;
+import io.github.heartalborada_del.newBingAPI.utils.DefaultClient;
 import okhttp3.OkHttpClient;
 
 public class Chat {
     private final OkHttpClient c;
 
     private final boolean bypassCN;
+
+    private final Logger logger;
+
     /**
      * @param defaultCookie your bing cookies
-     * @param bypassCN
-     * @throws NullPointerException
      */
-    public Chat(String defaultCookie, Boolean bypassCN) throws NullPointerException {
-        c = new defaultClient(bypassCN, defaultCookie).getClient();
+    public Chat(String defaultCookie, Boolean bypassCN) {
+        c = new DefaultClient(bypassCN, defaultCookie).getClient();
         this.bypassCN = bypassCN;
+        this.logger = new Logger() {
+            @Override
+            public void Info(String log) {
+            }
+
+            @Override
+            public void Error(String log) {
+            }
+
+            @Override
+            public void Warn(String log) {
+            }
+
+            @Override
+            public void Debug(String log) {
+            }
+        };
     }
-    public Chat(String defaultCookie, Boolean bypassCN,String IP) throws NullPointerException {
-        c = new defaultClient(bypassCN, defaultCookie,IP).getClient();
+
+    public Chat(String defaultCookie, Boolean bypassCN, Logger logger) throws NullPointerException {
+        c = new DefaultClient(bypassCN, defaultCookie).getClient();
         this.bypassCN = bypassCN;
+        this.logger = logger;
     }
+
     public ChatInstance newChat() throws Exception {
-        return new ChatInstance(c,bypassCN);
+        return new ChatInstance(c, logger);
     }
 }

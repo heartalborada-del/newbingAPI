@@ -4,18 +4,19 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import io.github.heartalborada_del.newBingAPI.interfaces.Callback;
+import io.github.heartalborada_del.newBingAPI.interfaces.Logger;
 import io.github.heartalborada_del.newBingAPI.types.ChatWebsocketJson;
-import io.github.heartalborada_del.newBingAPI.types.chat.argument;
-import io.github.heartalborada_del.newBingAPI.types.chat.message;
-import io.github.heartalborada_del.newBingAPI.types.chat.participant;
-import io.github.heartalborada_del.newBingAPI.types.chat.previousMessages;
+import io.github.heartalborada_del.newBingAPI.types.chat.Argument;
+import io.github.heartalborada_del.newBingAPI.types.chat.Message;
+import io.github.heartalborada_del.newBingAPI.types.chat.Participant;
+import io.github.heartalborada_del.newBingAPI.types.chat.PreviousMessages;
 import okhttp3.Response;
 import okhttp3.WebSocket;
 import okhttp3.WebSocketListener;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class conversationWebsocket extends WebSocketListener {
+public class ConversationWebsocket extends WebSocketListener {
     private final char TerminalChar = '\u001e';
     private final String conversationId;
     private final String clientId;
@@ -23,18 +24,21 @@ public class conversationWebsocket extends WebSocketListener {
     private final String question;
     private final String invocationID;
     private final Callback callback;
+    private final Logger logger;
 
-    public conversationWebsocket(String ConversationId, String ClientId, String ConversationSignature, String question, short invocationID, Callback callback) {
+    public ConversationWebsocket(String ConversationId, String ClientId, String ConversationSignature, String question, short invocationID, Callback callback, Logger logger) {
         conversationId = ConversationId;
         clientId = ClientId;
         conversationSignature = ConversationSignature;
         this.question = question;
         this.invocationID = String.valueOf(invocationID);
         this.callback = callback;
+        this.logger = logger;
     }
 
     @Override
     public void onClosed(@NotNull WebSocket webSocket, int code, @NotNull String reason) {
+        logger.Info(String.format("%s-%s websocket is closed",conversationId,question));
         super.onClosed(webSocket, code, reason);
     }
 
@@ -45,52 +49,56 @@ public class conversationWebsocket extends WebSocketListener {
 
     @Override
     public void onFailure(@NotNull WebSocket webSocket, @NotNull Throwable t, @Nullable Response response) {
+        logger.Error(String.format("%s-%s websocket is failed, reason: [%s]",conversationId,question,t.getCause()));
         super.onFailure(webSocket, t, response);
     }
 
     @Override
     public void onMessage(@NotNull WebSocket webSocket, @NotNull String text) {
-        for(String textSpited : text.split(String.valueOf(TerminalChar))){
+        for (String textSpited : text.split(String.valueOf(TerminalChar))) {
+            logger.Info(String.format("%s-%s websocket is received new message [%s]",conversationId,question,textSpited));
             JsonObject json = JsonParser.parseString(textSpited).getAsJsonObject();
-            if(json.isEmpty()){
+            if (json.isEmpty()) {
                 webSocket.send("{\"type:6\"}\u001E");
-                webSocket.send(new Gson().toJson(
-                        new ChatWebsocketJson(new argument[]{
-                                new argument(
-                                        utils.randomString(32).toLowerCase(),
+                String s=new Gson().toJson(
+                        new ChatWebsocketJson(new Argument[]{
+                                new Argument(
+                                        Utils.randomString(32).toLowerCase(),
                                         invocationID.equals("1"),
-                                        new message(
+                                        new Message(
                                                 "zh-CN",
                                                 null,
                                                 null,
                                                 null,
                                                 null,
-                                                utils.getNowTime(),
+                                                Utils.getNowTime(),
                                                 question
                                         ),
                                         conversationSignature,
-                                        new participant(clientId),
+                                        new Participant(clientId),
                                         conversationId,
-                                        new previousMessages[]{}
+                                        new PreviousMessages[]{}
                                 )
                         }, invocationID)
-                ) + TerminalChar);
-            } else if(json.has("type")){
+                );
+                System.out.println(s);
+                webSocket.send(s + TerminalChar);
+            } else if (json.has("type")) {
                 int type = json.getAsJsonObject("type").getAsInt();
-                if(type == 3) {
+                if (type == 3) {
                     //end
                     webSocket.close(0, String.valueOf(TerminalChar));
                 } else if (type == 6) {
                     //resend packet
                     webSocket.send("{\"type\":6}\u001E");
-                } else if(type == 2){
+                } else if (type == 2) {
                     if (json.getAsJsonObject("item").has("result") && !json.getAsJsonObject("item").getAsJsonObject("result").getAsJsonPrimitive("value").getAsString().equals("Success")) {
-                        callback.onFailed(json, json.getAsJsonObject("item").getAsJsonObject("result").getAsJsonPrimitive("message").getAsString());
+                        callback.onFailure(json, json.getAsJsonObject("item").getAsJsonObject("result").getAsJsonPrimitive("message").getAsString());
                     } else {
                         callback.onSuccess(json);
                     }
                 } else if (type == 1) {
-                    //TODO MESSAGE UPDATE EVENT
+                    callback.onUpdate(json);
                 }
             }
         }

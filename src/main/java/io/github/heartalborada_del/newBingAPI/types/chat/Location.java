@@ -1,10 +1,10 @@
 package io.github.heartalborada_del.newBingAPI.types.chat;
 
-public class location {
+public class Location {
     private final double Latitude;
     private final double Longitude;
 
-    public location(double latitude, double longitude) {
+    public Location(double latitude, double longitude) {
         Latitude = latitude;
         Longitude = longitude;
     }
