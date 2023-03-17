@@ -2,9 +2,38 @@ package io.github.heartalborada_del.newBingAPI.types.chat;
 
 public class Argument {
     private final String source = "cib";
-    private final String[] optionsSets = {"nlu_direct_response_filter", "deepleo", "disable_emoji_spoken_text", "responsible_ai_policy_235", "enablemm", "harmonyv3", "actions", "chatgpt", "wlthrottle", "cpcttl7d", "blocklistv2", "disbing", "dv3sugg"};
-    private final String[] allowedMessageTypes = {"Chat", "InternalSearchQuery", "InternalSearchResult", "Disengaged", "InternalLoaderMessage", "RenderCardRequest", "AdsQuery", "SemanticSerp", "GenerateContentQuery", "SearchQuery"};
-    private final String[] sliceIds = {"scfraithtr3", "scraith30", "linkimgincf", "308sahara", "228h3adss0", "h3adss0", "0310wlthrot", "cache0307", "ssoverlap50", "ssplon", "sssreduce", "sswebtop2", "302blocklist", "308disbing", "224locals0", "224locals0"};
+    private final String[] optionsSets = {
+            "nlu_direct_response_filter",
+            "deepleo",
+            "disable_emoji_spoken_text",
+            "responsible_ai_policy_235",
+            "enablemm",
+            "galileo",
+            "wlthrottle",
+            "blocklistv2",
+            "disbing",
+            "dv3sugg"
+    };
+    private final String[] allowedMessageTypes = {
+            "Chat",
+            "InternalSearchQuery",
+            "InternalSearchResult",
+            "Disengaged",
+            "InternalLoaderMessage",
+            "RenderCardRequest",
+            "AdsQuery",
+            "SemanticSerp",
+            "GenerateContentQuery",
+            "SearchQuery"
+    };
+    private final String[] sliceIds = {
+            "revdv3cf",
+            "perfinstcf",
+            "0310wlthrot",
+            "302blocklist",
+            "308disbing",
+            "314glprompts0"
+    };
     private final String traceId;
     private final boolean isStartOfSession;
     private final Message message;
