@@ -20,9 +20,11 @@ public class ChatInstance {
     private final String conversationSignature;
     private short chatCount = -1;
     private final Logger logger;
-    public ChatInstance(OkHttpClient httpClient, Logger logger) throws Exception {
+    private final String locale;
+    public ChatInstance(OkHttpClient httpClient, Logger logger, String locale) throws Exception {
         client = httpClient;
         this.logger = logger;
+        this.locale = locale;
         logger.Debug("Creating Conversation ID");
         Request req = new Request.Builder().url("https://www.bing.com/turing/conversation/create").get().build();
         String s = Objects.requireNonNull(client.newCall(req).execute().body()).string();
@@ -56,7 +58,8 @@ public class ChatInstance {
                         question,
                         chatCount,
                         callback,
-                        logger)
+                        logger,
+                        locale)
         );
         return this;
     }

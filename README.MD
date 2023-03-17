@@ -2,6 +2,8 @@
 
 这是一个newBing API的Java实现
 
+![Commit activity](https://img.shields.io/github/commit-activity/m/heartalborada-del/newbingAPI)
+
 ## 目前请先将 `byPassCN` 设置成 `false`
 
 ## How to use it
@@ -22,7 +24,7 @@ public class Main {
     public static void main(String[] args) {
         new Chat(
                 "Your cookies",
-                true
+                false
         ).newChat().newQuestion("Your question", new Callback() {
             @Override
             public void onSuccess(JsonObject rawData) {
@@ -43,4 +45,4 @@ public class Main {
 ```
 
 ## Version
-![https://mvnrepository.com/artifact/io.github.heartalborada-del/newBingAPI](https://img.shields.io/maven-central/v/io.github.heartalborada-del/newBingAPI)
+![Maven central version](https://img.shields.io/maven-central/v/io.github.heartalborada-del/newBingAPI)

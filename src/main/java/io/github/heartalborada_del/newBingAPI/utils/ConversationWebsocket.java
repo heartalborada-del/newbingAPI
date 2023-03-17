@@ -1,6 +1,5 @@
 package io.github.heartalborada_del.newBingAPI.utils;
 
-import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -17,8 +16,6 @@ import okhttp3.WebSocketListener;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Arrays;
-
 public class ConversationWebsocket extends WebSocketListener {
     private final char TerminalChar = '\u001e';
     private final String conversationId;
@@ -28,8 +25,9 @@ public class ConversationWebsocket extends WebSocketListener {
     private final String invocationID;
     private final Callback callback;
     private final Logger logger;
+    private final String locale;
 
-    public ConversationWebsocket(String ConversationId, String ClientId, String ConversationSignature, String question, short invocationID, Callback callback, Logger logger) {
+    public ConversationWebsocket(String ConversationId, String ClientId, String ConversationSignature, String question, short invocationID, Callback callback, Logger logger, String locale) {
         conversationId = ConversationId;
         clientId = ClientId;
         conversationSignature = ConversationSignature;
@@ -37,11 +35,12 @@ public class ConversationWebsocket extends WebSocketListener {
         this.invocationID = String.valueOf(invocationID);
         this.callback = callback;
         this.logger = logger;
+        this.locale = locale;
     }
 
     @Override
     public void onClosed(@NotNull WebSocket webSocket, int code, @NotNull String reason) {
-        logger.Info(String.format("%s-%s websocket is closed",conversationSignature,question));
+        logger.Info(String.format("[%s] [%s] websocket is closed",conversationSignature,question));
         super.onClosed(webSocket, code, reason);
     }
 
@@ -52,25 +51,25 @@ public class ConversationWebsocket extends WebSocketListener {
 
     @Override
     public void onFailure(@NotNull WebSocket webSocket, @NotNull Throwable t, @Nullable Response response) {
-        logger.Error(String.format("%s-%s websocket is failed, reason: [%s]",conversationSignature,question, Arrays.toString(t.getStackTrace())));
+        logger.Error(String.format("[%s] [%s] websocket is failed, reason: [%s]",conversationSignature,question, t.getCause().getMessage()));
         super.onFailure(webSocket, t, response);
     }
 
     @Override
     public void onMessage(@NotNull WebSocket webSocket, @NotNull String text) {
         for (String textSpited : text.split(String.valueOf(TerminalChar))) {
-            logger.Info(String.format("%s-%s websocket is received new message [%s]",conversationSignature,question,textSpited));
+            logger.Debug(String.format("[%s] [%s] websocket is received new message [%s]",conversationSignature,question,textSpited));
             JsonObject json = JsonParser.parseString(textSpited).getAsJsonObject();
             if (json.isEmpty()) {
-                webSocket.send("{\"type\":6}" + TerminalChar);
+                sendData(webSocket,"{\"type\":6}");
                 String s=new GsonBuilder().disableHtmlEscaping().create().toJson(
                         new ChatWebsocketJson(new Argument[]{
                                 new Argument(
                                         Utils.randomString(32).toLowerCase(),
                                         invocationID.equals("1"),
                                         new Message(
-                                                "en-US",
-                                                "en-US",
+                                                locale,
+                                                locale,
                                                 null,
                                                 null,
                                                 null,
@@ -84,7 +83,7 @@ public class ConversationWebsocket extends WebSocketListener {
                                 )
                         }, invocationID)
                 );
-                webSocket.send(s + TerminalChar);
+                sendData(webSocket,s);
             } else if (json.has("type")) {
                 int type = json.getAsJsonPrimitive("type").getAsInt();
                 if (type == 3) {
@@ -92,7 +91,7 @@ public class ConversationWebsocket extends WebSocketListener {
                     webSocket.close(0, String.valueOf(TerminalChar));
                 } else if (type == 6) {
                     //resend packet
-                    webSocket.send("{\"type\":6}"+TerminalChar);
+                    sendData(webSocket,"{\"type\":6}");
                 } else if (type == 2) {
                     if (json.getAsJsonObject("item").has("result") && !json.getAsJsonObject("item").getAsJsonObject("result").getAsJsonPrimitive("value").getAsString().equals("Success")) {
                         callback.onFailure(json, json.getAsJsonObject("item").getAsJsonObject("result").getAsJsonPrimitive("message").getAsString());
@@ -101,7 +100,13 @@ public class ConversationWebsocket extends WebSocketListener {
                     }
                 } else if (type == 1) {
                     callback.onUpdate(json);
+                } else if (type == 7){
+                    callback.onFailure(json,json.getAsJsonPrimitive("error").getAsString());
+                    webSocket.close(0,String.valueOf(TerminalChar));
                 }
+            } else if (json.has("error")){
+                callback.onFailure(json,json.getAsJsonPrimitive("error").getAsString());
+                webSocket.close(0,String.valueOf(TerminalChar));
             }
         }
         super.onMessage(webSocket, text);
@@ -110,7 +115,11 @@ public class ConversationWebsocket extends WebSocketListener {
     @Override
     public void onOpen(@NotNull WebSocket webSocket, @NotNull Response response) {
         super.onOpen(webSocket, response);
-        webSocket.send("{\"protocol\":\"json\",\"version\":1}" + TerminalChar);
+        sendData(webSocket,"{\"protocol\":\"json\",\"version\":1}");
+    }
 
+    private void sendData(@NotNull WebSocket ws, @NotNull String data){
+        logger.Debug(String.format("[%s] [%s] client send message [%s]",conversationSignature,question,data));
+        ws.send(data + TerminalChar);
     }
 }
