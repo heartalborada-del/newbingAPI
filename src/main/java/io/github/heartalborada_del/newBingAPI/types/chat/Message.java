@@ -10,7 +10,7 @@ public class Message {
     private final String author = "user";
     private final String inputMethod = "Keyboard";
     private final String text;
-    private final String messageType = "SearchQuery";
+    private final String messageType = "Chat";
 
     public Message(String locale, String market, String region, String location, LocationHints locationHints, String timestamp, String text) {
         this.locale = locale;

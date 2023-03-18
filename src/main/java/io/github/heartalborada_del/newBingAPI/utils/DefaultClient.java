@@ -25,6 +25,12 @@ public class DefaultClient {
         return overseaIPs[new Random().nextInt(overseaIPs.length)];
     }
 
+    /**
+     * Creates a new instance of the DefaultClient class.
+     *
+     * @param BypassCN Set to <code>true</code> if you want to bypass Bing's blockade in China.
+     * @param Cookie   a string value representing the cookie to be set in the request header.
+     */
     public DefaultClient(Boolean BypassCN, String Cookie) {
         bypassCN = BypassCN;
         IP = getRandomIP();
@@ -32,11 +38,23 @@ public class DefaultClient {
         client = new OkHttpClient.Builder().addInterceptor(new headerInterceptor()).build();
     }
 
+    /**
+     * Returns the OkHttpClient instance associated with this DefaultClient.
+     *
+     * @return the OkHttpClient instance associated with this DefaultClient.
+     */
     public OkHttpClient getClient() {
         return client;
     }
 
     private class headerInterceptor implements Interceptor {
+        /**
+         * Intercepts the outgoing request and sets the required headers.
+         *
+         * @param chain the interceptor chain.
+         * @return the response received after processing the request.
+         * @throws IOException if an error occurs while processing the request.
+         */
         @NotNull
         @Override
         public Response intercept(@NotNull Chain chain) throws IOException {

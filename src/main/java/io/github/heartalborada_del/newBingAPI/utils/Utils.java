@@ -23,11 +23,20 @@ public class Utils {
             .optionalStart()
             .appendOffsetId()
             .toFormatter();
+    /**
+     * Returns the current date and time as a string formatted with an offset.
+     * @return the current date and time as a string formatted with an offset.
+     */
     public static String getNowTime() {
         ZonedDateTime date = ZonedDateTime.now();
         return date.format(OFFSET_DATE_FORMATTER);
     }
 
+    /**
+     * Generates a random string of the specified length.
+     * @param length the length of the random string.
+     * @return a random string of the specified length.
+     */
     public static String randomString(int length) {
         String str = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
         Random random = new Random();

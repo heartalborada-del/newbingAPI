@@ -11,6 +11,7 @@ import io.github.heartalborada_del.newBingAPI.utils.ConversationWebsocket;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 
+import java.io.IOException;
 import java.util.Objects;
 
 public class ChatInstance {
@@ -21,7 +22,17 @@ public class ChatInstance {
     private short chatCount = -1;
     private final Logger logger;
     private final String locale;
-    public ChatInstance(OkHttpClient httpClient, Logger logger, String locale) throws Exception {
+    private int maxNumConversation = 15;
+
+    /**
+     * Constructor for a new ChatInstance.
+     * @param httpClient The OkHttpClient instance used for making API requests.
+     * @param logger The logger instance used for logging.
+     * @param locale The locale of the conversation.
+     * @throws IOException If there is an error making the API request.
+     * @throws ConversationException If there is an error creating the conversation instance.
+     */
+    public ChatInstance(OkHttpClient httpClient, Logger logger, String locale) throws IOException, ConversationException {
         client = httpClient;
         this.logger = logger;
         this.locale = locale;
@@ -38,17 +49,40 @@ public class ChatInstance {
         conversationSignature = json.getAsJsonPrimitive("conversationSignature").getAsString();
     }
 
+    /**
+     * Sends a new question to the conversation instance.
+     * @param question The question to send to the conversation instance.
+     * @param callback The callback function to call when the API responds.
+     * @return This ChatInstance.
+     * @throws ConversationUninitializedException If the conversation instance has not been initialized.
+     * @throws ConversationLimitedException If the conversation instance has reached its message limit.
+     */
     public ChatInstance newQuestion(String question, Callback callback) throws ConversationUninitializedException, ConversationLimitedException {
         if (chatCount < 0){
             logger.Error("Conversation is uninitialized");
             throw new ConversationUninitializedException();
-        } else if (chatCount >= 10) {
+        } else if (chatCount > maxNumConversation) {
             logger.Error("Conversation is limited");
             throw new ConversationLimitedException();
         }
+        Callback cb = new Callback() {
+            @Override
+            public void onSuccess(JsonObject rawData) {
+                if(rawData.has("item") && rawData.getAsJsonObject("item").has("throttling") && rawData.getAsJsonObject("item").getAsJsonObject("throttling").has("maxNumUserMessagesInConversation")){
+                    maxNumConversation = rawData.getAsJsonObject("item")
+                            .getAsJsonObject("throttling")
+                            .getAsJsonPrimitive("maxNumUserMessagesInConversation").getAsInt();
+                }
+                callback.onSuccess(rawData);
+            }
+            @Override
+            public void onFailure(JsonObject rawData, String cause) {callback.onFailure(rawData,cause);}
+
+            @Override
+            public void onUpdate(JsonObject rawData) {callback.onUpdate(rawData);}
+        };
         logger.Debug(String.format("Get [%s] answer",question));
         Request request = new Request.Builder().get().url("wss://sydney.bing.com/sydney/ChatHub").build();
-        chatCount++;
         client.newWebSocket(
                 request,
                 new ConversationWebsocket(
@@ -57,10 +91,11 @@ public class ChatInstance {
                         conversationSignature,
                         question,
                         chatCount,
-                        callback,
+                        cb,
                         logger,
                         locale)
         );
+        chatCount++;
         return this;
     }
 }
