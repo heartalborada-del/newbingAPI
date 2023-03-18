@@ -2,7 +2,10 @@
 
 这是一个newBing API的Java实现
 
-![Commit activity](https://img.shields.io/github/commit-activity/m/heartalborada-del/newbingAPI)
+![CodeQL](https://github.com/heartalborada-del/newbingAPI/actions/workflows/codeql.yml/badge.svg)
+![CommitActivity](https://img.shields.io/github/commit-activity/m/heartalborada-del/newbingAPI)
+![issues](https://img.shields.io/github/issues/heartalborada-del/newBingAPI)
+![license](https://img.shields.io/github/license/heartalborada-del/newBingAPI)
 
 ## 目前请先将 `byPassCN` 设置成 `false`
 
@@ -45,4 +48,4 @@ public class Main {
 ```
 
 ## Version
-![Maven central version](https://img.shields.io/maven-central/v/io.github.heartalborada-del/newBingAPI)
+![MavenCentralVersion](https://img.shields.io/maven-central/v/io.github.heartalborada-del/newBingAPI)

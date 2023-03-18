@@ -1,7 +1,7 @@
 package io.github.heartalborada_del.newBingAPI.exceptions;
 
-public class ConversationUninitializedException extends Exception {
+public class ConversationUninitializedException extends ConversationException {
     public ConversationUninitializedException() {
-        super();
+        super("Conversation is uninitialized");
     }
 }

@@ -10,7 +10,7 @@ import static java.time.format.DateTimeFormatter.*;
 import static java.time.temporal.ChronoField.*;
 
 public class Utils {
-    private static final DateTimeFormatter OFFSET_DATE_FORMATTER= new DateTimeFormatterBuilder()
+    private static final DateTimeFormatter OFFSET_DATE_FORMATTER = new DateTimeFormatterBuilder()
             .parseCaseInsensitive()
             .append(ISO_LOCAL_DATE)
             .appendLiteral('T')
@@ -23,8 +23,10 @@ public class Utils {
             .optionalStart()
             .appendOffsetId()
             .toFormatter();
+
     /**
      * Returns the current date and time as a string formatted with an offset.
+     *
      * @return the current date and time as a string formatted with an offset.
      */
     public static String getNowTime() {
@@ -34,6 +36,7 @@ public class Utils {
 
     /**
      * Generates a random string of the specified length.
+     *
      * @param length the length of the random string.
      * @return a random string of the specified length.
      */

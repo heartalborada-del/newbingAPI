@@ -15,7 +15,7 @@ public interface Callback {
      * Called when the asynchronous operation fails.
      *
      * @param rawData the JSON data returned by the operation
-     * @param cause the cause of the failure
+     * @param cause   the cause of the failure
      */
     void onFailure(JsonObject rawData, String cause);
 
