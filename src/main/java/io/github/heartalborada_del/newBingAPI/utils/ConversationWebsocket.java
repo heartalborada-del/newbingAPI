@@ -15,8 +15,6 @@ import okhttp3.WebSocketListener;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.concurrent.locks.Lock;
-
 public class ConversationWebsocket extends WebSocketListener {
     private final char TerminalChar = '\u001e';
     private final String conversationId;
@@ -27,6 +25,7 @@ public class ConversationWebsocket extends WebSocketListener {
     private final Callback callback;
     private final Logger logger;
     private final String locale;
+
     public ConversationWebsocket(String ConversationId, String ClientId, String ConversationSignature, String question, short invocationID, Callback callback, Logger logger, String locale) {
         conversationId = ConversationId;
         clientId = ClientId;
@@ -46,12 +45,14 @@ public class ConversationWebsocket extends WebSocketListener {
 
     @Override
     public void onClosing(@NotNull WebSocket webSocket, int code, @NotNull String reason) {
+        logger.Info(String.format("[%s] [%s] websocket is closing", conversationSignature, question));
         super.onClosing(webSocket, code, reason);
     }
 
     @Override
     public void onFailure(@NotNull WebSocket webSocket, @NotNull Throwable t, @Nullable Response response) {
         //logger.Error(String.format("[%s] [%s] websocket is failed, reason: [%s]",conversationSignature,question, t.getCause()));
+        webSocket.close(1000, String.valueOf(TerminalChar));
         super.onFailure(webSocket, t, response);
     }
 
@@ -88,7 +89,7 @@ public class ConversationWebsocket extends WebSocketListener {
                 int type = json.getAsJsonPrimitive("type").getAsInt();
                 if (type == 3) {
                     //end
-                    webSocket.close(0, String.valueOf(TerminalChar));
+                    webSocket.close(1000, String.valueOf(TerminalChar));
                 } else if (type == 6) {
                     //resend packet
                     sendData(webSocket, "{\"type\":6}");
@@ -102,11 +103,11 @@ public class ConversationWebsocket extends WebSocketListener {
                     callback.onUpdate(json);
                 } else if (type == 7) {
                     callback.onFailure(json, json.getAsJsonPrimitive("error").getAsString());
-                    webSocket.close(0, String.valueOf(TerminalChar));
+                    webSocket.close(1000, String.valueOf(TerminalChar));
                 }
             } else if (json.has("error")) {
                 callback.onFailure(json, json.getAsJsonPrimitive("error").getAsString());
-                webSocket.close(0, String.valueOf(TerminalChar));
+                webSocket.close(1000, String.valueOf(TerminalChar));
             }
         }
         super.onMessage(webSocket, text);

@@ -1,8 +1,5 @@
 package io.github.heartalborada_del.newBingAPI;
 
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.LoadingCache;
 import io.github.heartalborada_del.newBingAPI.exceptions.ConversationException;
 import io.github.heartalborada_del.newBingAPI.instances.ChatInstance;
 import io.github.heartalborada_del.newBingAPI.interfaces.Logger;
@@ -10,10 +7,10 @@ import io.github.heartalborada_del.newBingAPI.utils.DefaultClient;
 import okhttp3.OkHttpClient;
 
 import java.io.IOException;
-import java.util.concurrent.TimeUnit;
+import java.net.Proxy;
 
 public class Chat {
-    private final OkHttpClient c;
+    private final OkHttpClient.Builder c;
     private final Logger logger;
     private final String locale;
 
@@ -25,7 +22,7 @@ public class Chat {
      * @author heartalborada-del
      */
     public Chat(String defaultCookie, Boolean bypassCN) {
-        c = new DefaultClient(bypassCN, defaultCookie).getClient();
+        c = new DefaultClient(bypassCN, defaultCookie).getClient().newBuilder();
         this.locale = "zh-CN";
         this.logger = new Logger() {
             @Override
@@ -56,7 +53,7 @@ public class Chat {
      * @see Logger
      */
     public Chat(String defaultCookie, Boolean bypassCN, Logger logger) {
-        c = new DefaultClient(bypassCN, defaultCookie).getClient();
+        c = new DefaultClient(bypassCN, defaultCookie).getClient().newBuilder();
         this.locale = "zh-CN";
         this.logger = logger;
     }
@@ -70,7 +67,7 @@ public class Chat {
      * @author heartalborada-del
      */
     public Chat(String defaultCookie, Boolean bypassCN, String locale) {
-        c = new DefaultClient(bypassCN, defaultCookie).getClient();
+        c = new DefaultClient(bypassCN, defaultCookie).getClient().newBuilder();
         this.locale = locale;
         this.logger = new Logger() {
             @Override
@@ -102,9 +99,14 @@ public class Chat {
      * @see Logger
      */
     public Chat(String defaultCookie, Boolean bypassCN, Logger logger, String locale) {
-        c = new DefaultClient(bypassCN, defaultCookie).getClient();
+        c = new DefaultClient(bypassCN, defaultCookie).getClient().newBuilder();
         this.locale = locale;
         this.logger = logger;
+    }
+
+    public Chat setProxy(Proxy proxy) {
+        c.proxy(proxy);
+        return this;
     }
 
     /**

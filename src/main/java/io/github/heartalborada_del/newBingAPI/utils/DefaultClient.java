@@ -11,7 +11,7 @@ import java.util.Random;
 import java.util.UUID;
 
 public class DefaultClient {
-    private final OkHttpClient client;
+    private final OkHttpClient.Builder builder;
     private final String cookie;
     private final boolean bypassCN;
 
@@ -20,10 +20,6 @@ public class DefaultClient {
     };
 
     private final String IP;
-
-    private String getRandomIP() {
-        return overseaIPs[new Random().nextInt(overseaIPs.length)];
-    }
 
     /**
      * Creates a new instance of the DefaultClient class.
@@ -35,7 +31,11 @@ public class DefaultClient {
         bypassCN = BypassCN;
         IP = getRandomIP();
         cookie = Cookie;
-        client = new OkHttpClient.Builder().addInterceptor(new headerInterceptor()).build();
+        builder = new OkHttpClient.Builder().addInterceptor(new headerInterceptor());
+    }
+
+    private String getRandomIP() {
+        return overseaIPs[new Random().nextInt(overseaIPs.length)];
     }
 
     /**
@@ -44,7 +44,7 @@ public class DefaultClient {
      * @return the OkHttpClient instance associated with this DefaultClient.
      */
     public OkHttpClient getClient() {
-        return client;
+        return builder.build();
     }
 
     private class headerInterceptor implements Interceptor {

@@ -9,6 +9,7 @@ import io.github.heartalborada_del.newBingAPI.exceptions.ConversationUninitializ
 import io.github.heartalborada_del.newBingAPI.interfaces.Callback;
 import io.github.heartalborada_del.newBingAPI.interfaces.Logger;
 import io.github.heartalborada_del.newBingAPI.utils.ConversationWebsocket;
+import okhttp3.Dispatcher;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 
@@ -19,29 +20,28 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class ChatInstance {
+    public static ExecutorService threadPool = Executors.newFixedThreadPool(1);
     private final OkHttpClient client;
     private final String conversationId;
     private final String clientId;
     private final String conversationSignature;
-    private short chatCount = -1;
     private final Logger logger;
     private final String locale;
+    private short chatCount;
     private int maxNumConversation = 15;
-    private long time = -1;
-    public static ExecutorService threadPool = Executors.newFixedThreadPool(1);
-    private final Object lock = new Object();
-    private volatile Boolean isWebsocketExecute = false;
+    private final long time;
+
     /**
      * Constructor for a new ChatInstance.
      *
-     * @param httpClient The OkHttpClient instance used for making API requests.
-     * @param logger     The logger instance used for logging.
-     * @param locale     The locale of the conversation.
+     * @param httpClientBuilder The OkHttpClient.Builder instance used for making API requests.
+     * @param logger            The logger instance used for logging.
+     * @param locale            The locale of the conversation.
      * @throws IOException           If there is an error making the API request.
      * @throws ConversationException If there is an error creating the conversation instance.
      */
-    public ChatInstance(OkHttpClient httpClient, Logger logger, String locale) throws IOException, ConversationException {
-        client = httpClient;
+    public ChatInstance(OkHttpClient.Builder httpClientBuilder, Logger logger, String locale) throws IOException, ConversationException {
+        client = httpClientBuilder.dispatcher(new Dispatcher(threadPool)).build();
         this.logger = logger;
         this.locale = locale;
         logger.Debug("Creating Conversation ID");
@@ -82,7 +82,6 @@ public class ChatInstance {
         Callback cb = new Callback() {
             @Override
             public void onSuccess(JsonObject rawData) {
-                isWebsocketExecute = false;
                 if (rawData.has("item") && rawData.getAsJsonObject("item").has("throttling") && rawData.getAsJsonObject("item").getAsJsonObject("throttling").has("maxNumUserMessagesInConversation")) {
                     maxNumConversation = rawData.getAsJsonObject("item")
                             .getAsJsonObject("throttling")
@@ -93,7 +92,6 @@ public class ChatInstance {
 
             @Override
             public void onFailure(JsonObject rawData, String cause) {
-                isWebsocketExecute = false;
                 callback.onFailure(rawData, cause);
             }
 
@@ -102,27 +100,22 @@ public class ChatInstance {
                 callback.onUpdate(rawData);
             }
         };
-        threadPool.submit(() -> {
-            synchronized (lock) {
-                logger.Debug(String.format("Get [%s] answer", question));
-                Request request = new Request.Builder().get().url("wss://sydney.bing.com/sydney/ChatHub").build();
-                client.newWebSocket(
-                        request,
-                        new ConversationWebsocket(
-                                conversationId,
-                                clientId,
-                                conversationSignature,
-                                question,
-                                chatCount,
-                                cb,
-                                logger,
-                                locale
-                        )
-                );
-                isWebsocketExecute = true;
-                while (isWebsocketExecute){}
-            }
-        });
+
+        Request request = new Request.Builder().get().url("wss://sydney.bing.com/sydney/ChatHub").build();
+        logger.Debug(String.format("Add a question [%s] to the queue,the current length of the queue is %d", question, client.dispatcher().runningCallsCount()));
+        client.newWebSocket(
+                request,
+                new ConversationWebsocket(
+                        conversationId,
+                        clientId,
+                        conversationSignature,
+                        question,
+                        chatCount,
+                        cb,
+                        logger,
+                        locale
+                )
+        );
         chatCount++;
         return this;
     }
