@@ -41,8 +41,9 @@ public class Argument {
     private final Participant participant;
     private final String conversationId;
     private final PreviousMessages[] previousMessages;
+    private final String tone;
 
-    public Argument(String traceId, boolean isStartOfSession, Message message, String conversationSignature, Participant participant, String conversationId, PreviousMessages[] previousMessages) {
+    public Argument(String traceId, boolean isStartOfSession, Message message, String conversationSignature, Participant participant, String conversationId, PreviousMessages[] previousMessages, String tone) {
         this.traceId = traceId;
         this.isStartOfSession = isStartOfSession;
         this.message = message;
@@ -50,5 +51,6 @@ public class Argument {
         this.participant = participant;
         this.conversationId = conversationId;
         this.previousMessages = previousMessages;
+        this.tone = tone;
     }
 }

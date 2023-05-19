@@ -30,6 +30,7 @@ public class ChatInstance {
     private short chatCount;
     private int maxNumConversation = 15;
     private final long time;
+    private final String tone;
 
     /**
      * Constructor for a new ChatInstance.
@@ -37,13 +38,15 @@ public class ChatInstance {
      * @param httpClientBuilder The OkHttpClient.Builder instance used for making API requests.
      * @param logger            The logger instance used for logging.
      * @param locale            The locale of the conversation.
+     * @param tone Set NewBing Mode <code>Creative</code> <code>Balanced</code> <code>Precise</code>
      * @throws IOException           If there is an error making the API request.
      * @throws ConversationException If there is an error creating the conversation instance.
      */
-    public ChatInstance(OkHttpClient.Builder httpClientBuilder, Logger logger, String locale) throws IOException, ConversationException {
+    public ChatInstance(OkHttpClient.Builder httpClientBuilder, Logger logger, String locale, String tone) throws IOException, ConversationException {
         client = httpClientBuilder.dispatcher(new Dispatcher(threadPool)).build();
         this.logger = logger;
         this.locale = locale;
+        this.tone = tone;
         logger.Debug("Creating Conversation ID");
         Request req = new Request.Builder().url("https://www.bing.com/turing/conversation/create").get().build();
         String s = Objects.requireNonNull(client.newCall(req).execute().body()).string();
@@ -113,8 +116,8 @@ public class ChatInstance {
                         chatCount,
                         cb,
                         logger,
-                        locale
-                )
+                        locale,
+                        tone)
         );
         chatCount++;
         return this;

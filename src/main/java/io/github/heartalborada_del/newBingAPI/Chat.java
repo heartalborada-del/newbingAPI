@@ -13,16 +13,17 @@ public class Chat {
     private final OkHttpClient.Builder c;
     private final Logger logger;
     private final String locale;
-
+    private final String tone;
     /**
      * Initialize the instance.
      *
      * @param defaultCookie Your bing cookie
-     * @param bypassCN      Set to <code>true</code> if you want to bypass Bing's blockade in China
+     * @param tone Set NewBing Mode <code>Creative</code> <code>Balanced</code> <code>Precise</code>
      * @author heartalborada-del
      */
-    public Chat(String defaultCookie, Boolean bypassCN) {
-        c = new DefaultClient(bypassCN, defaultCookie).getClient().newBuilder();
+    public Chat(String defaultCookie, String tone) {
+        this.tone = tone;
+        c = new DefaultClient(defaultCookie).getClient().newBuilder();
         this.locale = "zh-CN";
         this.logger = new Logger() {
             @Override
@@ -47,13 +48,14 @@ public class Chat {
      * Initialize the instance.
      *
      * @param defaultCookie Your bing cookie
-     * @param bypassCN      Set to <code>true</code> if you want to bypass Bing's blockade in China
      * @param logger        Your Logger implementation
+     * @param tone Set NewBing Mode <code>Creative</code> <code>Balanced</code> <code>Precise</code>
      * @author heartalborada-del
      * @see Logger
      */
-    public Chat(String defaultCookie, Boolean bypassCN, Logger logger) {
-        c = new DefaultClient(bypassCN, defaultCookie).getClient().newBuilder();
+    public Chat(String defaultCookie, Logger logger, String tone) {
+        c = new DefaultClient(defaultCookie).getClient().newBuilder();
+        this.tone = tone;
         this.locale = "zh-CN";
         this.logger = logger;
     }
@@ -62,13 +64,14 @@ public class Chat {
      * Initialize the instance.
      *
      * @param defaultCookie Your bing cookie
-     * @param bypassCN      Set to <code>true</code> if you want to bypass Bing's blockade in China
      * @param locale        The locale of the conversation.<p>Please set the language code following the format of <code>(ISO-639 Language Code)-(ISO-3166 Country Codes)</code>.</p>
+     * @param tone Set NewBing Mode <code>Creative</code> <code>Balanced</code> <code>Precise</code>
      * @author heartalborada-del
      */
-    public Chat(String defaultCookie, Boolean bypassCN, String locale) {
-        c = new DefaultClient(bypassCN, defaultCookie).getClient().newBuilder();
+    public Chat(String defaultCookie, String locale, String tone) {
+        c = new DefaultClient(defaultCookie).getClient().newBuilder();
         this.locale = locale;
+        this.tone = tone;
         this.logger = new Logger() {
             @Override
             public void Info(String log) {
@@ -92,16 +95,17 @@ public class Chat {
      * Initialize the instance.
      *
      * @param defaultCookie Your bing cookie
-     * @param bypassCN      Set to <code>true</code> if you want to bypass Bing's blockade in China
      * @param logger        Your Logger implementation
      * @param locale        The locale of the conversation.<p>Please set the language code following the format of <code>(ISO-639 Language Code)-(ISO-3166 Country Codes)</code>.</p>
+     * @param tone Set NewBing Mode <code>Creative</code> <code>Balanced</code> <code>Precise</code>
      * @author heartalborada-del
      * @see Logger
      */
-    public Chat(String defaultCookie, Boolean bypassCN, Logger logger, String locale) {
-        c = new DefaultClient(bypassCN, defaultCookie).getClient().newBuilder();
+    public Chat(String defaultCookie, Logger logger, String locale, String tone) {
+        c = new DefaultClient(defaultCookie).getClient().newBuilder();
         this.locale = locale;
         this.logger = logger;
+        this.tone = tone;
     }
 
     public Chat setProxy(Proxy proxy) {
@@ -119,6 +123,6 @@ public class Chat {
      * @see ChatInstance
      */
     public ChatInstance newChat() throws IOException, ConversationException {
-        return new ChatInstance(c, logger, locale);
+        return new ChatInstance(c, logger, locale, tone);
     }
 }

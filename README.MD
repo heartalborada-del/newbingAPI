@@ -7,7 +7,7 @@
 ![issues](https://img.shields.io/github/issues/heartalborada-del/newBingAPI)
 ![license](https://img.shields.io/github/license/heartalborada-del/newBingAPI)
 
-## 目前请先将 `byPassCN` 设置成 `false`
+## ~~目前请先将 `byPassCN` 设置成 `false`~~(已移除)
 
 ## How to use it
 
@@ -26,8 +26,8 @@ import com.google.gson.JsonObject;
 public class Main {
     public static void main(String[] args) {
         new Chat(
-                "Your cookies",
-                false
+                "Your cookies(or you can set it empty)",
+                "Set new bing mode(Creative/Balanced/Precise)"
         ).newChat().newQuestion("Your question", new Callback() {
             @Override
             public void onSuccess(JsonObject rawData) {

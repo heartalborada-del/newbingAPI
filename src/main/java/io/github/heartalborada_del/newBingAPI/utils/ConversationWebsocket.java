@@ -25,8 +25,9 @@ public class ConversationWebsocket extends WebSocketListener {
     private final Callback callback;
     private final Logger logger;
     private final String locale;
+    private final String tone;
 
-    public ConversationWebsocket(String ConversationId, String ClientId, String ConversationSignature, String question, short invocationID, Callback callback, Logger logger, String locale) {
+    public ConversationWebsocket(String ConversationId, String ClientId, String ConversationSignature, String question, short invocationID, Callback callback, Logger logger, String locale, String tone) {
         conversationId = ConversationId;
         clientId = ClientId;
         conversationSignature = ConversationSignature;
@@ -35,6 +36,7 @@ public class ConversationWebsocket extends WebSocketListener {
         this.callback = callback;
         this.logger = logger;
         this.locale = locale;
+        this.tone = tone;
     }
 
     @Override
@@ -80,8 +82,8 @@ public class ConversationWebsocket extends WebSocketListener {
                                         conversationSignature,
                                         new Participant(clientId),
                                         conversationId,
-                                        null
-                                )
+                                        null,
+                                        tone)
                         }, invocationID)
                 );
                 sendData(webSocket, s);
